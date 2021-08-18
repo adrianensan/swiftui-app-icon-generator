@@ -5,6 +5,8 @@ public struct GalleryView<AppIcon: AppIconExportable>: View {
   
   @State var currentIcon: AppIcon = .default
   
+  public init() { }
+  
   public var body: some View {
     HStack {
       ScrollView {

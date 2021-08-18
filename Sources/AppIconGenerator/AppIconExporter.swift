@@ -2,9 +2,11 @@ import SwiftUI
 
 public struct AppIconExporter<AppIcon: AppIconExportable> {
   
-  static var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent("SolitaireIcons") }
+  public init() { }
   
-  public static func exportWatchOSIcons() {
+  var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent("SolitaireIcons") }
+  
+  public func exportWatchOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("watchOS") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
@@ -16,7 +18,7 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     }
   }
   
-  public static func exportIOSIcons() {
+  public func exportIOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
@@ -38,7 +40,7 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     }
   }
   
-  static func save(view: NSView, size: Int, to path: URL) {
+  func save(view: NSView, size: Int, to path: URL) {
     let screenSale = NSScreen.main!.backingScaleFactor
     let targetSize = NSSize(width: CGFloat(size) / screenSale, height: CGFloat(size) / screenSale)
     guard let imageRepresentation = view.bitmapImageRepForCachingDisplay(in: view.frame),
@@ -56,15 +58,15 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
       .write(to: path)
   }
   
-  static func sizeString(for size: CGFloat) -> String {
+  func sizeString(for size: CGFloat) -> String {
     size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", size) : "\(size)"
   }
   
-  static func fileName(for scale: IconScale) -> String {
+  func fileName(for scale: IconScale) -> String {
     "app-icon-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
   }
   
-  static func contentsJsonEntry(for scale: IconScale, isLast: Bool) -> String {
+  func contentsJsonEntry(for scale: IconScale, isLast: Bool) -> String {
     """
     {
       "filename" : "\(fileName(for: scale))",
@@ -75,14 +77,14 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     """
   }
 
-  static var contentsJsonFilePrefix: String {
+  var contentsJsonFilePrefix: String {
     """
     {
     "images" : [
     """
   }
   
-  static var contentsJsonFileSuffix: String {
+  var contentsJsonFileSuffix: String {
     """
     ],
     "info" : {
