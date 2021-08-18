@@ -1,0 +1,43 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "DeviceInfo",
+        "repositoryURL": "https://github.com/adrianensan/device-info",
+        "state": {
+          "branch": "main",
+          "revision": "71e7d84dc23aa2e21df97cac2a959448864becc0",
+          "version": null
+        }
+      },
+      {
+        "package": "SelfUI",
+        "repositoryURL": "https://github.com/adrianensan/self-shared-ui",
+        "state": {
+          "branch": "main",
+          "revision": "d4daa9c1dd4f0f7369d470736fbaec0b2b4f0ce6",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftConvenience",
+        "repositoryURL": "https://github.com/adrianensan/swift-convenience",
+        "state": {
+          "branch": "main",
+          "revision": "fcaac675a3ed55029bcf4e28850dda57f5550649",
+          "version": null
+        }
+      },
+      {
+        "package": "SwiftUIConvenience",
+        "repositoryURL": "https://github.com/adrianensan/swiftui-convenience",
+        "state": {
+          "branch": "main",
+          "revision": "21eb221c346f6d5ca33c03918e21835f0ed0effa",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
