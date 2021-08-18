@@ -1,6 +1,6 @@
 import SwiftUI
 
-protocol AppIconExportable {
+public protocol AppIconExportable {
 
   static var `default`: Self { get }
   

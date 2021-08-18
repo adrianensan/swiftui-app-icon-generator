@@ -1,10 +1,10 @@
 import SwiftUI
 
-struct AppIconExporter<AppIcon: AppIconExportable> {
+public struct AppIconExporter<AppIcon: AppIconExportable> {
   
   static var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent("SolitaireIcons") }
   
-  static func exportWatchOSIcons() {
+  public static func exportWatchOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("watchOS") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
@@ -16,7 +16,7 @@ struct AppIconExporter<AppIcon: AppIconExportable> {
     }
   }
   
-  static func exportIOSIcons() {
+  public static func exportIOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])

@@ -1,11 +1,11 @@
 import SwiftUI
 import SelfUI
 
-struct GalleryView<AppIcon: AppIconExportable>: View {
+public struct GalleryView<AppIcon: AppIconExportable>: View {
   
   @State var currentIcon: AppIcon = .default
   
-  var body: some View {
+  public var body: some View {
     HStack {
       ScrollView {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 140), spacing: 12, alignment: .top)], spacing: 36) {
