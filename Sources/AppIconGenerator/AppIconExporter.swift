@@ -2,9 +2,13 @@ import SwiftUI
 
 public struct AppIconExporter<AppIcon: AppIconExportable> {
   
-  public init() { }
+  let appName: String
   
-  var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent("SolitaireIcons") }
+  public init(appName: String) {
+    self.appName = appName
+  }
+  
+  var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent(appName) }
   
   public func exportWatchOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
