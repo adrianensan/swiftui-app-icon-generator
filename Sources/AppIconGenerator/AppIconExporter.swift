@@ -25,22 +25,32 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
   public func exportIOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
+    guard let previewsExportPath = baseExportPath?.appendingPathComponent("ios-previews") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
+    try? FileManager.default.createDirectory(at: previewsExportPath, withIntermediateDirectories: true, attributes: [:])
     
     for icon in AppIcon.allCases {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.name).appiconset")
+      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.name)-preview.imageset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
+      try? FileManager.default.createDirectory(at: previewIconExportPath, withIntermediateDirectories: true, attributes: [:])
       let view = NSHostingView(rootView: icon.view(for: 1024 / screenSale))
       view.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
       let scales = icon.name == AppIcon.default.name ? mainAppIconScales : alternateAppIconScales
-      var contentsJsonFile = contentsJsonFilePrefix
+      let previewScales = [IconScale(size: 60, scaleFactor: 2, purpose: .iphone),
+                           IconScale(size: 60, scaleFactor: 3, purpose: .iphone)]
       for scale in scales {
         save(view: view, size: Int(scale.size * CGFloat(scale.scaleFactor)),
-             to: iconExportPath.appendingPathComponent(fileName(for: scale)))
-        contentsJsonFile += contentsJsonEntry(for: scale, isLast: scale == scales.last)
+             to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(for: scale)))
       }
-      contentsJsonFile += contentsJsonFileSuffix
-      try? contentsJsonFile.write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+      for scale in previewScales {
+        save(view: view, size: Int(scale.size * CGFloat(scale.scaleFactor)),
+             to: previewIconExportPath.appendingPathComponent(AppIconAssetContentsGenerator.fileName(for: scale)))
+      }
+      try? AppiconsetContentsGenerator.contentsFile(for: icon.name, with: scales)
+        .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+      try? AppIconAssetContentsGenerator.contentsFile(for: icon.name, with: previewScales)
+        .write(to: previewIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
     }
   }
   
@@ -48,7 +58,7 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     let screenSale = NSScreen.main!.backingScaleFactor
     let targetSize = NSSize(width: CGFloat(size) / screenSale, height: CGFloat(size) / screenSale)
     guard let imageRepresentation = view.bitmapImageRepForCachingDisplay(in: view.frame),
-          let newImage = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .calibratedRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return }
+          let newImage = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return }
 
     view.cacheDisplay(in: view.frame, to: imageRepresentation)
     newImage.size = targetSize
@@ -60,42 +70,5 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     
     try? newImage.representation(using: .png, properties: [.compressionFactor: 0.9])?
       .write(to: path)
-  }
-  
-  func sizeString(for size: CGFloat) -> String {
-    size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", size) : "\(size)"
-  }
-  
-  func fileName(for scale: IconScale) -> String {
-    "app-icon-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
-  }
-  
-  func contentsJsonEntry(for scale: IconScale, isLast: Bool) -> String {
-    """
-    {
-      "filename" : "\(fileName(for: scale))",
-      "idiom" : "\(scale.purpose.rawValue)",
-      "scale" : "\(scale.scaleFactor)x",
-      "size" : "\(sizeString(for: scale.size))x\(sizeString(for: scale.size))"
-    }\(isLast ? "" : ",")
-    """
-  }
-
-  var contentsJsonFilePrefix: String {
-    """
-    {
-    "images" : [
-    """
-  }
-  
-  var contentsJsonFileSuffix: String {
-    """
-    ],
-    "info" : {
-    "author" : "xcode",
-    "version" : 1
-    }
-    }
-    """
   }
 }
