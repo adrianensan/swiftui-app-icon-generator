@@ -9,8 +9,8 @@ if useLocal {
              path: "~/Repos/swift-packages/swift-convenience"),
     .package(name: "SwiftUIConvenience",
              path: "~/Repos/swift-packages/swiftui-convenience"),
-    .package(name: "HelloColors",
-             path: "~/Repos/swift-packages/hello-colors")
+    .package(name: "HelloColor",
+             path: "~/Repos/swift-packages/hello-color")
   ]
 } else {
   dependencies = [
@@ -20,7 +20,7 @@ if useLocal {
     .package(name: "SwiftUIConvenience",
              url: "https://github.com/hello-apps/swiftui-convenience",
              branch: "main"),
-    .package(name: "HelloColors",
+    .package(name: "HelloColor",
              url: "https://github.com/hello-apps/hello-color",
              branch: "main")
   ]
@@ -41,7 +41,7 @@ let package = Package(
       dependencies: [
         .byNameItem(name: "SwiftConvenience", condition: nil),
         .byNameItem(name: "SwiftUIConvenience", condition: nil),
-        .byNameItem(name: "HelloColors", condition: nil),
+        .byNameItem(name: "HelloColor", condition: nil),
       ]),
     .testTarget(
       name: "AppIconGeneratorTests",

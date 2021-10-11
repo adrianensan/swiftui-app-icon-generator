@@ -2,11 +2,11 @@
   "object": {
     "pins": [
       {
-        "package": "HelloColors",
+        "package": "HelloColor",
         "repositoryURL": "https://github.com/hello-apps/hello-color",
         "state": {
           "branch": "main",
-          "revision": "a712018900b33d2c65f77fffd86d32c3706b3cbd",
+          "revision": "acabbcd8386ae4f6bc9f7e5237887861954880a6",
           "version": null
         }
       },
