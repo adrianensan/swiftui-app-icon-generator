@@ -28,7 +28,7 @@ if useLocal {
 
 let package = Package(
   name: "AppIconGenerator",
-  platforms: [ .macOS(.v12)],
+  platforms: [.macOS(.v12)],
   products: [
     .library(
       name: "AppIconGenerator",
