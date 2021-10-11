@@ -1,35 +1,47 @@
 // swift-tools-version:5.5
 import PackageDescription
 
+let useLocal = false
+let dependencies: [Package.Dependency]
+if useLocal {
+  dependencies = [
+    .package(name: "SwiftConvenience",
+             path: "~/Repos/swift-packages/swift-convenience"),
+    .package(name: "SwiftUIConvenience",
+             path: "~/Repos/swift-packages/swiftui-convenience"),
+    .package(name: "HelloColors",
+             path: "~/Repos/swift-packages/hello-colors")
+  ]
+} else {
+  dependencies = [
+    .package(name: "SwiftConvenience",
+             url: "https://github.com/hello-apps/swift-convenience",
+             branch: "main"),
+    .package(name: "SwiftUIConvenience",
+             url: "https://github.com/hello-apps/swiftui-convenience",
+             branch: "main"),
+    .package(name: "HelloColors",
+             url: "https://github.com/hello-apps/hello-color",
+             branch: "main")
+  ]
+}
+
 let package = Package(
   name: "AppIconGenerator",
-  platforms: [
-    .iOS(.v14),
-      .macOS(.v11)
-  ],
+  platforms: [ .macOS(.v12)],
   products: [
     .library(
       name: "AppIconGenerator",
       targets: ["AppIconGenerator"]),
   ],
-  dependencies: [
-    .package(name: "SwiftConvenience",
-             url: "https://github.com/adrianensan/swift-convenience",
-             branch: "main"),
-    .package(name: "SwiftUIConvenience",
-             url: "https://github.com/adrianensan/swiftui-convenience",
-             branch: "main"),
-    .package(name: "SelfUI",
-             url: "https://github.com/adrianensan/self-shared-ui",
-             branch: "main")
-  ],
+  dependencies: dependencies,
   targets: [
     .target(
       name: "AppIconGenerator",
       dependencies: [
         .byNameItem(name: "SwiftConvenience", condition: nil),
         .byNameItem(name: "SwiftUIConvenience", condition: nil),
-        .byNameItem(name: "SelfUI", condition: nil)
+        .byNameItem(name: "HelloColors", condition: nil),
       ]),
     .testTarget(
       name: "AppIconGeneratorTests",

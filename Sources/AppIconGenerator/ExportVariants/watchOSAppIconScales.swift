@@ -21,7 +21,7 @@ enum WatchOSAppIconScale: CaseIterable {
     }
   }
   
-  var size: CGFloat {
+  var size: Double {
     switch self {
     case ._24_2x: return 24
     case ._27_5_2x: return 27.5

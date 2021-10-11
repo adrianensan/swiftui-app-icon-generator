@@ -7,7 +7,7 @@ struct IconScale: Equatable {
     case iosMarketing = "ios-marketing"
   }
   
-  var size: CGFloat
+  var size: Double
   var scaleFactor: Int
   var purpose: Purpose
 }

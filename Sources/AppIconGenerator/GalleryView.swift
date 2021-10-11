@@ -1,5 +1,5 @@
 import SwiftUI
-import SelfUI
+import SwiftUIConvenience
 
 public struct GalleryView<AppIcon: AppIconExportable>: View {
   

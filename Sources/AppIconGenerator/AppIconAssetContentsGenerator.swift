@@ -11,7 +11,7 @@ enum AppIconAssetContentsGenerator {
     return file
   }
   
-  static func sizeString(for size: CGFloat) -> String {
+  static func sizeString(for size: Double) -> String {
     size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", size) : "\(size)"
   }
   
