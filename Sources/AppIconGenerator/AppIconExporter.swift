@@ -14,7 +14,7 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("watchOS") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
-    let iconView = NSHostingView(rootView: AppIcon.default.view(for: 1024 / screenSale))
+    let iconView = NSHostingView(rootView: AppIcon.default.view.frame(width: 1024 / screenSale, height: 1024 / screenSale))
     iconView.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
     for scale in WatchOSAppIconScale.allCases {
       let scaleString = scale.size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", scale.size) : "\(scale.size)"
@@ -30,13 +30,13 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     try? FileManager.default.createDirectory(at: previewsExportPath, withIntermediateDirectories: true, attributes: [:])
     
     for icon in AppIcon.allCases {
-      let iconExportPath = exportPath.appendingPathComponent("\(icon.name).appiconset")
-      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.name)-preview.imageset")
+      let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
+      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.imageName)-preview.imageset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
       try? FileManager.default.createDirectory(at: previewIconExportPath, withIntermediateDirectories: true, attributes: [:])
-      let view = NSHostingView(rootView: icon.view(for: 1024 / screenSale))
+      let view = NSHostingView(rootView: icon.view.frame(width: 1024 / screenSale, height: 1024 / screenSale))
       view.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
-      let scales = icon.name == AppIcon.default.name ? mainAppIconScales : alternateAppIconScales
+      let scales = icon.imageName == AppIcon.default.imageName ? mainAppIconScales : alternateAppIconScales
       let previewScales = [IconScale(size: 60, scaleFactor: 2, purpose: .iphone),
                            IconScale(size: 60, scaleFactor: 3, purpose: .iphone)]
       for scale in scales {
@@ -47,9 +47,9 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
         save(view: view, size: Int(scale.size * CGFloat(scale.scaleFactor)),
              to: previewIconExportPath.appendingPathComponent(AppIconAssetContentsGenerator.fileName(for: scale)))
       }
-      try? AppiconsetContentsGenerator.contentsFile(for: icon.name, with: scales)
+      try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: scales)
         .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
-      try? AppIconAssetContentsGenerator.contentsFile(for: icon.name, with: previewScales)
+      try? AppIconAssetContentsGenerator.contentsFile(for: icon.imageName, with: previewScales)
         .write(to: previewIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
     }
   }

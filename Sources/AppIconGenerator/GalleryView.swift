@@ -11,9 +11,9 @@ public struct GalleryView<AppIcon: AppIconExportable>: View {
     HStack {
       ScrollView {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100, maximum: 140), spacing: 12, alignment: .top)], spacing: 36) {
-          ForEach(AppIcon.allCases, id: \.name) { icon in
+          ForEach(AppIcon.allCases, id: \.imageName) { icon in
             VStack {
-              icon.view(for: 80 * 4)
+              icon.view
                 .scaleEffect(0.25)
                 .frame(width: 80, height: 80)
                 .clipShape(AppIconShape())
@@ -22,12 +22,12 @@ public struct GalleryView<AppIcon: AppIconExportable>: View {
                 }
               Text(icon.displayName)
                 .multilineTextAlignment(.center)
-            }.id(icon.name)
+            }.id(icon.imageName)
           }
         }
         .padding(16)
       }.frame(maxWidth: .infinity, maxHeight: .infinity)
-      currentIcon.view(for: 512)
+      currentIcon.view
         .clipShape(AppIconShape())
         .frame(width: 512  + 32,
                height: 512)
