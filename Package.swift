@@ -2,10 +2,15 @@
 import PackageDescription
 import Foundation
 
+var helloPackagesPath = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("/Developer/Hello/packages/", isDirectory: true).absoluteString
+if helloPackagesPath.hasPrefix("file://") {
+  helloPackagesPath.removeFirst(7)
+}
+
 let helloColorPackage: Package.Dependency
-if FileManager.default.fileExists(atPath: "Users/adrian/Repos/swift-packages/hello-color") {
+if FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
   helloColorPackage = .package(name: "HelloColor",
-                                     path: "~/Repos/swift-packages/hello-color")
+                                     path: "\(helloPackagesPath)hello-color")
 } else {
   helloColorPackage = .package(name: "HelloColor",
                                      url: "https://github.com/hello-apps/hello-color",

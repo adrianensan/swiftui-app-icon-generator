@@ -1,3 +1,5 @@
+import SwiftConvenience
+import SwiftUIConvenience
 import SwiftUI
 
 public struct AppIconExporter<AppIcon: AppIconExportable> {
@@ -18,57 +20,46 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
     iconView.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
     for scale in WatchOSAppIconScale.allCases {
       let scaleString = scale.size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", scale.size) : "\(scale.size)"
-      save(view: iconView, size: Int(scale.size * CGFloat(scale.scaleValue)), to: exportPath.appendingPathComponent("app-icon-\(scaleString)@\(scale.scaleValue)x.png"))
+      save(view: AppIcon.default.view, size: scale.size * CGFloat(scale.scaleValue), to: exportPath.appendingPathComponent("app-icon-\(scaleString)@\(scale.scaleValue)x.png"))
     }
   }
   
   public func exportIOSIcons() {
     let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
-    guard let previewsExportPath = baseExportPath?.appendingPathComponent("ios-previews") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
-    try? FileManager.default.createDirectory(at: previewsExportPath, withIntermediateDirectories: true, attributes: [:])
     
     for icon in AppIcon.allCases {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
-      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.imageName)-preview.imageset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
-      try? FileManager.default.createDirectory(at: previewIconExportPath, withIntermediateDirectories: true, attributes: [:])
       let view = NSHostingView(rootView: icon.view.frame(width: 1024 / screenSale, height: 1024 / screenSale))
       view.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
+      
+      // Main App Icon
       let scales = icon.imageName == AppIcon.default.imageName ? mainAppIconScales : alternateAppIconScales
-      let previewScales = [IconScale(size: 60, scaleFactor: 2, purpose: .iphone),
-                           IconScale(size: 60, scaleFactor: 3, purpose: .iphone)]
       for scale in scales {
-        save(view: view, size: Int(scale.size * CGFloat(scale.scaleFactor)),
-             to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(for: scale)))
-      }
-      for scale in previewScales {
-        save(view: view, size: Int(scale.size * CGFloat(scale.scaleFactor)),
-             to: previewIconExportPath.appendingPathComponent(AppIconAssetContentsGenerator.fileName(for: scale)))
+        save(view: icon.view, size: scale.size * CGFloat(scale.scaleFactor) / screenSale,
+             to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
       }
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: scales)
         .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
-      try? AppIconAssetContentsGenerator.contentsFile(for: icon.imageName, with: previewScales)
-        .write(to: previewIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+      
+      // App Icon Previews
+//      guard let previewsExportPath = baseExportPath?.appendingPathComponent("ios-previews") else { return }
+//      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.imageName)-preview.imageset")
+//      try? FileManager.default.createDirectory(at: previewIconExportPath, withIntermediateDirectories: true, attributes: [:])
+//      let previewScales = [IconScale(size: 60, scaleFactor: 2, purpose: .iphone),
+//                           IconScale(size: 60, scaleFactor: 3, purpose: .iphone)]
+//      for scale in previewScales {
+//        save(view: icon.view, size: scale.size * CGFloat(scale.scaleFactor),
+//             to: previewIconExportPath.appendingPathComponent(AppIconAssetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
+//      }
+//      try? AppIconAssetContentsGenerator.contentsFile(for: icon.imageName, with: previewScales)
+//        .write(to: previewIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
     }
   }
   
-  func save(view: NSView, size: Int, to path: URL) {
-    let screenSale = NSScreen.main!.backingScaleFactor
-    let targetSize = NSSize(width: CGFloat(size) / screenSale, height: CGFloat(size) / screenSale)
-    guard let imageRepresentation = view.bitmapImageRepForCachingDisplay(in: view.frame),
-          let newImage = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) else { return }
-
-    view.cacheDisplay(in: view.frame, to: imageRepresentation)
-    newImage.size = targetSize
-    NSGraphicsContext.saveGraphicsState()
-    NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: newImage)
-    NSGraphicsContext.current?.imageInterpolation = .high
-    imageRepresentation.draw(in: NSRect(origin: .zero, size: targetSize))
-    NSGraphicsContext.restoreGraphicsState()
-    
-    try? newImage.representation(using: .png, properties: [.compressionFactor: 0.9])?
-      .write(to: path)
+  func save<Content: View>(view: Content, size: CGFloat, to path: URL) {
+    try? ImageRenderer.renderData(view: view, size: CGSize(width: size, height: size))?.write(to: path)
   }
 }

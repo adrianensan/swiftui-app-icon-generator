@@ -5,7 +5,9 @@ enum AppIconAssetContentsGenerator {
   static func contentsFile(for appIconName: String, with scales: [IconScale]) -> String {
     var file = AppIconAssetContentsGenerator.contentsJsonFilePrefix
     for scale in scales {
-      file += AppIconAssetContentsGenerator.contentsJsonEntry(for: scale, isLast: scale == scales.last)
+      file += AppIconAssetContentsGenerator.contentsJsonEntry(appIconName: appIconName,
+                                                              scale: scale,
+                                                              isLast: scale == scales.last)
     }
     file += AppIconAssetContentsGenerator.contentsJsonFileSuffix
     return file
@@ -15,14 +17,14 @@ enum AppIconAssetContentsGenerator {
     size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", size) : "\(size)"
   }
   
-  static func fileName(for scale: IconScale) -> String {
-    "app-icon-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
+  static func fileName(appIconName: String, scale: IconScale) -> String {
+    "\(appIconName)-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
   }
   
-  static func contentsJsonEntry(for scale: IconScale, isLast: Bool) -> String {
+  static func contentsJsonEntry(appIconName: String, scale: IconScale, isLast: Bool) -> String {
     """
     {
-      "filename" : "\(fileName(for: scale))",
+      "filename" : "\(fileName(appIconName: appIconName, scale: scale))",
       "idiom" : "universal",
       "scale" : "\(scale.scaleFactor)x"
     }\(isLast ? "" : ",")
