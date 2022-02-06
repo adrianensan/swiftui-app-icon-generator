@@ -12,9 +12,8 @@ if FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
   helloColorPackage = .package(name: "HelloColor",
                                      path: "\(helloPackagesPath)hello-color")
 } else {
-  helloColorPackage = .package(name: "HelloColor",
-                                     url: "https://github.com/hello-apps/hello-color",
-                                     branch: "main")
+  helloColorPackage = .package(url: "https://github.com/hello-apps/hello-color",
+                               branch: "main")
 }
 
 let dependencies: [Package.Dependency] = [

@@ -25,20 +25,26 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
   }
   
   public func exportIOSIcons() {
-    let screenSale = NSScreen.main!.backingScaleFactor
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
     try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
-    
     for icon in AppIcon.allCases {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
-      let view = NSHostingView(rootView: icon.view.frame(width: 1024 / screenSale, height: 1024 / screenSale))
-      view.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
+      
+      guard let imageData = ImageRenderer.renderData(view: icon.view,
+                                                     size: CGSize(width: 1024, height: 1024),
+                                                     sizeIsPixels: true),
+            let nsImage = NSImage(data: imageData)
+      else { return }
+      
+      let imageView = Image(nsImage)
+        .resizable()
+        .aspectRatio(contentMode: .fill)
       
       // Main App Icon
       let scales = icon.imageName == AppIcon.default.imageName ? mainAppIconScales : alternateAppIconScales
       for scale in scales {
-        save(view: icon.view, size: scale.size * CGFloat(scale.scaleFactor) / screenSale,
+        save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
              to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
       }
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: scales)
@@ -60,6 +66,6 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
   }
   
   func save<Content: View>(view: Content, size: CGFloat, to path: URL) {
-    try? ImageRenderer.renderData(view: view, size: CGSize(width: size, height: size))?.write(to: path)
+    try? ImageRenderer.renderData(view: view, size: CGSize(width: size, height: size), sizeIsPixels: true)?.write(to: path)
   }
 }
