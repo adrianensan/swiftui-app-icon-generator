@@ -2,7 +2,7 @@ import SwiftConvenience
 import SwiftUIConvenience
 import SwiftUI
 
-public struct AppIconExporter<AppIcon: AppIconExportable> {
+public struct AppIconExporter {
   
   let appName: String
   
@@ -12,37 +12,43 @@ public struct AppIconExporter<AppIcon: AppIconExportable> {
   
   var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent(appName) }
   
-  public func exportWatchOSIcons() {
-    let screenSale = NSScreen.main!.backingScaleFactor
+  func baseImage<AppIcon: HelloAppIcon>(for icon: AppIcon) -> AnyView {
+    guard let imageData = ImageRenderer.renderData(view: icon.view,
+                                                   size: CGSize(width: 1024, height: 1024),
+                                                   sizeIsPixels: true),
+          let nsImage = NSImage(data: imageData)
+    else { return AnyView(Color.clear) }
+    
+    return AnyView(Image(nsImage)
+      .resizable()
+      .aspectRatio(contentMode: .fill))
+  }
+  
+  public func export<AppIcon: HelloAppIcon>(watchOSIcon icon: AppIcon) {
     guard let exportPath = baseExportPath?.appendingPathComponent("watchOS") else { return }
-    try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
-    let iconView = NSHostingView(rootView: AppIcon.default.view.frame(width: 1024 / screenSale, height: 1024 / screenSale))
-    iconView.frame = CGRect(origin: .zero, size: CGSize(width: 1024 / screenSale, height: 1024 / screenSale))
-    for scale in WatchOSAppIconScale.allCases {
-      let scaleString = scale.size.truncatingRemainder(dividingBy: 1) == 0 ? String(format: "%.0f", scale.size) : "\(scale.size)"
-      save(view: AppIcon.default.view, size: scale.size * CGFloat(scale.scaleValue), to: exportPath.appendingPathComponent("app-icon-\(scaleString)@\(scale.scaleValue)x.png"))
+    let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
+    try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
+    
+    let imageView = baseImage(for: icon)
+    
+    for scale in IconScale.watchOSIconScales {
+      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+           to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
+      try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: IconScale.watchOSIconScales)
+        .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
     }
   }
   
-  public func exportIOSIcons() {
+  public func export<AppIcon: HelloAppIcon>(IOSIcons icons: [AppIcon]) {
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
-    try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
     for icon in AppIcon.allCases {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
       
-      guard let imageData = ImageRenderer.renderData(view: icon.view,
-                                                     size: CGSize(width: 1024, height: 1024),
-                                                     sizeIsPixels: true),
-            let nsImage = NSImage(data: imageData)
-      else { return }
-      
-      let imageView = Image(nsImage)
-        .resizable()
-        .aspectRatio(contentMode: .fill)
+      let imageView = baseImage(for: icon)
       
       // Main App Icon
-      let scales = icon.imageName == AppIcon.default.imageName ? mainAppIconScales : alternateAppIconScales
+      let scales = icon.imageName == AppIcon.defaultIcon.imageName ? IconScale.iOSMainIconScales : IconScale.iOSAlternateIconScales
       for scale in scales {
         save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
              to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))

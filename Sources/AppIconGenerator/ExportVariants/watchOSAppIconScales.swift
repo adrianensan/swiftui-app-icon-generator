@@ -1,38 +1,21 @@
 import Foundation
 
-enum WatchOSAppIconScale: CaseIterable {
-  case _24_2x
-  case _27_5_2x
-  case _29_2x
-  case _29_3x
-  case _40_2x
-  case _44_2x
-  case _50_2x
-  case _86_2x
-  case _98_2x
-  case _108_2x
-  case _1024_1x
-  
-  var scaleValue: Int {
-    switch self {
-    case ._29_3x: return 3
-    case ._1024_1x: return 1
-    default: return 2
-    }
-  }
-  
-  var size: Double {
-    switch self {
-    case ._24_2x: return 24
-    case ._27_5_2x: return 27.5
-    case ._29_2x, ._29_3x: return 29
-    case ._40_2x: return 40
-    case ._44_2x: return 44
-    case ._50_2x: return 50
-    case ._86_2x: return 86
-    case ._98_2x: return 98
-    case ._108_2x: return 108
-    case ._1024_1x: return 1024
-    }
-  }
+public extension IconScale {
+  static var watchOSIconScales: [IconScale] = [
+    IconScale(size: 24, scaleFactor: 2, purpose: .watch, role: .notificationCenter, subtype: .watch38mm),
+    IconScale(size: 27.5, scaleFactor: 2, purpose: .watch, role: .notificationCenter, subtype: .watch42mm),
+    IconScale(size: 29, scaleFactor: 2, purpose: .watch, role: .companionSettings),
+    IconScale(size: 29, scaleFactor: 3, purpose: .watch, role: .companionSettings),
+    IconScale(size: 33, scaleFactor: 2, purpose: .watch, role: .notificationCenter, subtype: .watch45mm),
+    IconScale(size: 40, scaleFactor: 2, purpose: .watch, role: .appLauncher, subtype: .watch38mm),
+    IconScale(size: 44, scaleFactor: 2, purpose: .watch, role: .appLauncher, subtype: .watch40mm),
+    IconScale(size: 46, scaleFactor: 2, purpose: .watch, role: .appLauncher, subtype: .watch41mm),
+    IconScale(size: 50, scaleFactor: 2, purpose: .watch, role: .appLauncher, subtype: .watch44mm),
+    IconScale(size: 51, scaleFactor: 2, purpose: .watch, role: .appLauncher, subtype: .watch45mm),
+    IconScale(size: 86, scaleFactor: 2, purpose: .watch, role: .quickLook, subtype: .watch38mm),
+    IconScale(size: 98, scaleFactor: 2, purpose: .watch, role: .quickLook, subtype: .watch42mm),
+    IconScale(size: 108, scaleFactor: 2, purpose: .watch, role: .quickLook, subtype: .watch44mm),
+    IconScale(size: 117, scaleFactor: 2, purpose: .watch, role: .quickLook, subtype: .watch45mm),
+    IconScale(size: 1024, scaleFactor: 1, purpose: .watchMarketing)
+  ]
 }

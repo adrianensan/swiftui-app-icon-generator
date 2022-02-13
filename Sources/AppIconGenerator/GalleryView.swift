@@ -1,9 +1,10 @@
 import SwiftUI
+import SwiftConvenience
 import SwiftUIConvenience
 
-public struct GalleryView<AppIcon: AppIconExportable>: View {
+public struct GalleryView<AppIcon: HelloAppIcon>: View {
   
-  @State var currentIcon: AppIcon = .default
+  @State var currentIcon: AppIcon = AppIcon.defaultIcon
   
   public init() { }
   
@@ -11,7 +12,7 @@ public struct GalleryView<AppIcon: AppIconExportable>: View {
     HStack {
       ScrollView {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 60, maximum: 60), spacing: 12, alignment: .top)], spacing: 16) {
-          ForEach(AppIcon.allCases, id: \.imageName) { icon in
+          ForEach(AppIcon.allIcons) { icon in
             VStack {
               icon.view
                 .frame(width: 60, height: 60)

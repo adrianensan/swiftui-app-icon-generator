@@ -22,20 +22,33 @@ enum AppiconsetContentsGenerator {
   }
   
   static func contentsJsonEntry(appIconName: String, scale: IconScale, isLast: Bool) -> String {
-    """
+    var entry = """
     {
       "filename" : "\(fileName(appIconName: appIconName, scale: scale))",
       "idiom" : "\(scale.purpose.rawValue)",
       "scale" : "\(scale.scaleFactor)x",
-      "size" : "\(sizeString(for: scale.size))x\(sizeString(for: scale.size))"
-    }\(isLast ? "" : ",")
+    
     """
+    
+    if let role = scale.role {
+      entry += #"  "role" : "\#(role.rawValue)",\#n"#
+    }
+    
+    if let subtype = scale.subtype {
+      entry += #"  "subtype" : "\#(subtype.rawValue)",\#n"#
+    }
+    
+    entry += """
+      "size" : "\(sizeString(for: scale.size))x\(sizeString(for: scale.size))"
+    }\(isLast ? "" : ", ")
+    """
+    
+    return entry
   }
   
   static var contentsJsonFilePrefix: String {
     """
-    {
-    "images" : [
+    {"images" : [
     """
   }
   
@@ -43,10 +56,9 @@ enum AppiconsetContentsGenerator {
     """
     ],
     "info" : {
-    "author" : "xcode",
-    "version" : 1
-    }
-    }
+      "author" : "xcode",
+      "version" : 1
+    }}
     """
   }
 }
