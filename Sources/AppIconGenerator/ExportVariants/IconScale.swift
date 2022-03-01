@@ -3,7 +3,7 @@ import Foundation
 public struct IconScale: Equatable {
   
   public enum Purpose: String {
-    case iphone, ipad, watch
+    case iphone, ipad, mac, watch
     case iosMarketing = "ios-marketing"
     case watchMarketing = "watch-marketing"
   }

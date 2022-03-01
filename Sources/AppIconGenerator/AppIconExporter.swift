@@ -12,8 +12,8 @@ public struct AppIconExporter {
   
   var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent(appName) }
   
-  func baseImage<AppIcon: HelloAppIcon>(for icon: AppIcon) -> AnyView {
-    guard let imageData = ImageRenderer.renderData(view: icon.view,
+  func baseImage<IconView: View>(for iconView: IconView) -> AnyView {
+    guard let imageData = ImageRenderer.renderData(view: iconView,
                                                    size: CGSize(width: 1024, height: 1024),
                                                    sizeIsPixels: true),
           let nsImage = NSImage(data: imageData)
@@ -29,7 +29,7 @@ public struct AppIconExporter {
     let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
     try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
     
-    let imageView = baseImage(for: icon)
+    let imageView = baseImage(for: icon.view)
     
     for scale in IconScale.watchOSIconScales {
       save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
@@ -45,7 +45,7 @@ public struct AppIconExporter {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
       
-      let imageView = baseImage(for: icon)
+      let imageView = baseImage(for: icon.view)
       
       // Main App Icon
       let scales = icon.imageName == AppIcon.defaultIcon.imageName ? IconScale.iOSMainIconScales : IconScale.iOSAlternateIconScales
@@ -55,19 +55,31 @@ public struct AppIconExporter {
       }
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: scales)
         .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+    }
+  }
+  
+  public func export<AppIcon: HelloAppIcon>(macOSIcons icons: [AppIcon]) {
+    guard let exportPath = baseExportPath?.appendingPathComponent("macOS") else { return }
+    
+    // Main App Icon
+    let mainIconExportPath = exportPath.appendingPathComponent("AppIcon.appiconset")
+    try? FileManager.default.createDirectory(at: mainIconExportPath, withIntermediateDirectories: true, attributes: [:])
+    
+    let imageView = baseImage(for:  MacAppIconWrapperView(icon: AppIcon.defaultIcon))
+    
+    // Main App Icon
+    for scale in IconScale.macOSMainIconScales {
+      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+           to: mainIconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: AppIcon.defaultIcon.imageName, scale: scale)))
+    }
+    try? AppiconsetContentsGenerator.contentsFile(for: AppIcon.defaultIcon.imageName, with: IconScale.macOSMainIconScales)
+      .write(to: mainIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+    
+    for icon in AppIcon.allCases {
+      try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
       
-      // App Icon Previews
-//      guard let previewsExportPath = baseExportPath?.appendingPathComponent("ios-previews") else { return }
-//      let previewIconExportPath = previewsExportPath.appendingPathComponent("\(icon.imageName)-preview.imageset")
-//      try? FileManager.default.createDirectory(at: previewIconExportPath, withIntermediateDirectories: true, attributes: [:])
-//      let previewScales = [IconScale(size: 60, scaleFactor: 2, purpose: .iphone),
-//                           IconScale(size: 60, scaleFactor: 3, purpose: .iphone)]
-//      for scale in previewScales {
-//        save(view: icon.view, size: scale.size * CGFloat(scale.scaleFactor),
-//             to: previewIconExportPath.appendingPathComponent(AppIconAssetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
-//      }
-//      try? AppIconAssetContentsGenerator.contentsFile(for: icon.imageName, with: previewScales)
-//        .write(to: previewIconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+      save(view: baseImage(for: MacAppIconWrapperView(icon: icon)), size: 256,
+           to: exportPath.appendingPathComponent(icon.imageName + ".png"))
     }
   }
   
