@@ -9,8 +9,7 @@ if helloPackagesPath.hasPrefix("file://") {
 
 let helloColorPackage: Package.Dependency
 if FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
-  helloColorPackage = .package(name: "HelloColor",
-                                     path: "\(helloPackagesPath)hello-color")
+  helloColorPackage = .package(name: "HelloColor", path: "\(helloPackagesPath)hello-color")
 } else {
   helloColorPackage = .package(url: "https://github.com/hello-apps/hello-color",
                                branch: "main")
@@ -33,7 +32,7 @@ let package = Package(
     .target(
       name: "AppIconGenerator",
       dependencies: [
-        .byNameItem(name: "HelloColor", condition: nil)
+        .product(name: "HelloColor", package: "hello-color")
       ]),
     .testTarget(
       name: "AppIconGeneratorTests",

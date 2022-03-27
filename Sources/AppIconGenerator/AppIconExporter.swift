@@ -65,7 +65,7 @@ public struct AppIconExporter {
     let mainIconExportPath = exportPath.appendingPathComponent("AppIcon.appiconset")
     try? FileManager.default.createDirectory(at: mainIconExportPath, withIntermediateDirectories: true, attributes: [:])
     
-    let imageView = baseImage(for:  MacAppIconWrapperView(icon: AppIcon.defaultIcon))
+    let imageView = baseImage(for: AppIcon.defaultIcon.view)
     
     // Main App Icon
     for scale in IconScale.macOSMainIconScales {
@@ -78,8 +78,8 @@ public struct AppIconExporter {
     for icon in AppIcon.allCases {
       try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
       
-      save(view: baseImage(for: MacAppIconWrapperView(icon: icon)), size: 256,
-           to: exportPath.appendingPathComponent(icon.imageName + ".png"))
+      save(view: baseImage(for: icon.view), size: 256,
+           to: exportPath.appendingPathComponent("dock-icon-\(icon.rawValue).png"))
     }
   }
   

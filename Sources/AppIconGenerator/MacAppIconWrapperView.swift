@@ -2,13 +2,17 @@ import SwiftUI
 import SwiftConvenience
 import SwiftUIConvenience
 
-public struct MacAppIconWrapperView: View {
+public struct MacAppIconWrapperView<Content: View>: View {
   
-  var icon: any HelloAppIcon
+  var view: Content
+  
+  public init(_ content: () -> Content) {
+    self.view = content()
+  }
   
   public var body: some View {
     GeometryReader { geometry in
-      icon.view
+      view
         .clipShape(AppIconShape())
         .padding(0.05 * geometry.size.minSide)
     }
