@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftConvenience
 import SwiftUIConvenience
 
-public struct GalleryView<AppIcon: HelloAppIcon>: View {
+public struct GalleryView<AppIcon: AppIconExportable>: View {
   
   @State var currentIcon: AppIcon = AppIcon.defaultIcon
   
@@ -20,7 +20,7 @@ public struct GalleryView<AppIcon: HelloAppIcon>: View {
                 .onTapGesture {
                   currentIcon = icon
                 }
-              Text(icon.displayName)
+              Text(icon.name)
                 .multilineTextAlignment(.center)
             }.id(icon.imageName)
           }

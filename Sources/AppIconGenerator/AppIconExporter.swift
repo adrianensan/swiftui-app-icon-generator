@@ -24,7 +24,7 @@ public struct AppIconExporter {
       .aspectRatio(contentMode: .fill))
   }
   
-  public func export<AppIcon: HelloAppIcon>(watchOSIcon icon: AppIcon) {
+  public func export<AppIcon: AppIconExportable>(watchOSIcon icon: AppIcon) {
     guard let exportPath = baseExportPath?.appendingPathComponent("watchOS") else { return }
     let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
     try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
@@ -39,7 +39,7 @@ public struct AppIconExporter {
     }
   }
   
-  public func export<AppIcon: HelloAppIcon>(IOSIcons icons: [AppIcon]) {
+  public func export<AppIcon: AppIconExportable>(IOSIcons icons: [AppIcon]) {
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
     for icon in AppIcon.allCases {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
@@ -58,7 +58,7 @@ public struct AppIconExporter {
     }
   }
   
-  public func export<AppIcon: HelloAppIcon>(macOSIcons icons: [AppIcon]) {
+  public func export<AppIcon: AppIconExportable>(macOSIcons icons: [AppIcon]) {
     guard let exportPath = baseExportPath?.appendingPathComponent("macOS") else { return }
     
     // Main App Icon
@@ -79,7 +79,7 @@ public struct AppIconExporter {
       try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
       
       save(view: baseImage(for: icon.view), size: 256,
-           to: exportPath.appendingPathComponent("dock-icon-\(icon.rawValue).png"))
+           to: exportPath.appendingPathComponent("\(icon.imageName).png"))
     }
   }
   

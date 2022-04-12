@@ -1,8 +1,9 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.6
 import PackageDescription
 import Foundation
 
-var helloPackagesPath = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("/Developer/Hello/packages/", isDirectory: true).absoluteString
+var helloPackagesPath: String = #file
+helloPackagesPath = String(helloPackagesPath[...helloPackagesPath.lastIndex(of: "/")!]) + "../"
 if helloPackagesPath.hasPrefix("file://") {
   helloPackagesPath.removeFirst(7)
 }
