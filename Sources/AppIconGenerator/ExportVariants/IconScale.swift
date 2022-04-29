@@ -3,7 +3,7 @@ import Foundation
 public struct IconScale: Equatable {
   
   public enum Purpose: String {
-    case iphone, ipad, mac, watch
+    case iphone, ipad, mac, watch, universal
     case iosMarketing = "ios-marketing"
     case watchMarketing = "watch-marketing"
   }
@@ -24,21 +24,42 @@ public struct IconScale: Equatable {
     case watch45mm = "45mm"
   }
   
-  public var size: Double
+  public enum Platform: String {
+    case ios
+  }
+  
+  public var size: CGSize
   public var scaleFactor: Int
   public var purpose: Purpose
   public var role: Role?
+  public var platform: Platform?
   public var subtype: SubType?
   
   public init(size: Double,
               scaleFactor: Int,
               purpose: Purpose,
               role: Role? = nil,
+              platform: Platform? = nil,
+              subtype: SubType? = nil) {
+    self.size = CGSize(width: size, height: size)
+    self.scaleFactor = scaleFactor
+    self.purpose = purpose
+    self.role = role
+    self.platform = platform
+    self.subtype = subtype
+  }
+  
+  public init(size: CGSize,
+              scaleFactor: Int,
+              purpose: Purpose,
+              role: Role? = nil,
+              platform: Platform? = nil,
               subtype: SubType? = nil) {
     self.size = size
     self.scaleFactor = scaleFactor
     self.purpose = purpose
     self.role = role
+    self.platform = platform
     self.subtype = subtype
   }
 }

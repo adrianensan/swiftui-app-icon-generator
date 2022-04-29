@@ -39,6 +39,21 @@ public struct AppIconExporter {
     }
   }
   
+  public func export<AppIcon: AppIconExportable>(iMessageIcon icon: AppIcon) {
+    guard let exportPath = baseExportPath?.appendingPathComponent("iMessage") else { return }
+    let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).stickersiconset")
+    try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
+    
+    let imageView = baseImage(for: icon.view)
+    
+    for scale in IconScale.iMessageIconScales {
+      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+           to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
+      try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: IconScale.iMessageIconScales)
+        .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
+    }
+  }
+  
   public func export<AppIcon: AppIconExportable>(IOSIcons icons: [AppIcon]) {
     guard let exportPath = baseExportPath?.appendingPathComponent("ios") else { return }
     for icon in AppIcon.allCases {
@@ -78,12 +93,12 @@ public struct AppIconExporter {
     for icon in AppIcon.allCases {
       try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
       
-      save(view: baseImage(for: icon.view), size: 256,
+      save(view: baseImage(for: icon.view), size: CGSize(width: 256, height: 256),
            to: exportPath.appendingPathComponent("\(icon.imageName).png"))
     }
   }
   
-  func save<Content: View>(view: Content, size: CGFloat, to path: URL) {
-    try? ImageRenderer.renderData(view: view, size: CGSize(width: size, height: size), sizeIsPixels: true)?.write(to: path)
+  func save<Content: View>(view: Content, size: CGSize, to path: URL) {
+    try? ImageRenderer.renderData(view: view, size: size, sizeIsPixels: true)?.write(to: path)
   }
 }

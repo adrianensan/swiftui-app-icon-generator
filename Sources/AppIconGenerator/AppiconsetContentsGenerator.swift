@@ -18,7 +18,7 @@ enum AppiconsetContentsGenerator {
   }
   
   static func fileName(appIconName: String, scale: IconScale) -> String {
-    "\(appIconName)-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
+    "\(appIconName)-\(sizeString(for: scale.size.width))x\(sizeString(for: scale.size.height))@\(scale.scaleFactor)x.png"
   }
   
   static func contentsJsonEntry(appIconName: String, scale: IconScale, isLast: Bool) -> String {
@@ -34,12 +34,16 @@ enum AppiconsetContentsGenerator {
       entry += #"  "role" : "\#(role.rawValue)",\#n"#
     }
     
+    if let platform = scale.platform {
+      entry += #"  "platform" : "\#(platform.rawValue)",\#n"#
+    }
+    
     if let subtype = scale.subtype {
       entry += #"  "subtype" : "\#(subtype.rawValue)",\#n"#
     }
     
     entry += """
-      "size" : "\(sizeString(for: scale.size))x\(sizeString(for: scale.size))"
+      "size" : "\(sizeString(for: scale.size.width))x\(sizeString(for: scale.size.height))"
     }\(isLast ? "" : ", ")
     """
     

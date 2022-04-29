@@ -18,7 +18,7 @@ enum AppIconAssetContentsGenerator {
   }
   
   static func fileName(appIconName: String, scale: IconScale) -> String {
-    "\(appIconName)-\(sizeString(for: scale.size))@\(scale.scaleFactor)x.png"
+    "\(appIconName)-\(sizeString(for: scale.size.width))x\(sizeString(for: scale.size.height))@\(scale.scaleFactor)x.png"
   }
   
   static func contentsJsonEntry(appIconName: String, scale: IconScale, isLast: Bool) -> String {
