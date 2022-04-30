@@ -9,7 +9,7 @@ if helloPackagesPath.hasPrefix("file://") {
 }
 
 let helloColorPackage: Package.Dependency
-if FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
+if !helloPackagesPath.contains("/DerivedData/") && FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
   helloColorPackage = .package(name: "hello-color", path: "\(helloPackagesPath)hello-color")
 } else {
   helloColorPackage = .package(url: "https://github.com/hello-apps/hello-color",
