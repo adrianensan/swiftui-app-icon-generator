@@ -62,4 +62,12 @@ public struct IconScale: Equatable {
     self.platform = platform
     self.subtype = subtype
   }
+  
+  var widthScale: CGFloat {
+    min(1, size.width / size.height)
+  }
+  
+  var heightScale: CGFloat {
+    min(1, size.height / size.width)
+  }
 }

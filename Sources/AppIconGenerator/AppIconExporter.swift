@@ -12,9 +12,10 @@ public struct AppIconExporter {
   
   var baseExportPath: URL? { FileManager.default.urls(for: .downloadsDirectory, in: .userDomainMask).first?.appendingPathComponent(appName) }
   
-  func baseImage<IconView: View>(for iconView: IconView) -> AnyView {
+  func baseImage<IconView: View>(for iconView: IconView, scale: IconScale) -> AnyView {
     guard let imageData = ImageRenderer.renderData(view: iconView,
-                                                   size: CGSize(width: 1024, height: 1024),
+                                                   size: CGSize(width: 1024 * scale.widthScale,
+                                                                height: 1024 * scale.heightScale),
                                                    sizeIsPixels: true),
           let nsImage = NSImage(data: imageData)
     else { return AnyView(Color.clear) }
@@ -29,10 +30,8 @@ public struct AppIconExporter {
     let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
     try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
     
-    let imageView = baseImage(for: icon.view)
-    
     for scale in IconScale.watchOSIconScales {
-      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+      save(view: baseImage(for: icon.view, scale: scale), size: scale.size * CGFloat(scale.scaleFactor),
            to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: IconScale.watchOSIconScales)
         .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
@@ -44,10 +43,8 @@ public struct AppIconExporter {
     let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).stickersiconset")
     try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
     
-    let imageView = baseImage(for: icon.view)
-    
     for scale in IconScale.iMessageIconScales {
-      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+      save(view: baseImage(for: icon.view, scale: scale), size: scale.size * CGFloat(scale.scaleFactor),
            to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: IconScale.iMessageIconScales)
         .write(to: iconExportPath.appendingPathComponent("Contents.json"), atomically: true, encoding: .utf8)
@@ -60,12 +57,10 @@ public struct AppIconExporter {
       let iconExportPath = exportPath.appendingPathComponent("\(icon.imageName).appiconset")
       try? FileManager.default.createDirectory(at: iconExportPath, withIntermediateDirectories: true, attributes: [:])
       
-      let imageView = baseImage(for: icon.view)
-      
       // Main App Icon
       let scales = icon.imageName == AppIcon.defaultIcon.imageName ? IconScale.iOSMainIconScales : IconScale.iOSAlternateIconScales
       for scale in scales {
-        save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+        save(view: baseImage(for: icon.view, scale: scale), size: scale.size * CGFloat(scale.scaleFactor),
              to: iconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: icon.imageName, scale: scale)))
       }
       try? AppiconsetContentsGenerator.contentsFile(for: icon.imageName, with: scales)
@@ -80,11 +75,9 @@ public struct AppIconExporter {
     let mainIconExportPath = exportPath.appendingPathComponent("AppIcon.appiconset")
     try? FileManager.default.createDirectory(at: mainIconExportPath, withIntermediateDirectories: true, attributes: [:])
     
-    let imageView = baseImage(for: AppIcon.defaultIcon.view)
-    
     // Main App Icon
     for scale in IconScale.macOSMainIconScales {
-      save(view: imageView, size: scale.size * CGFloat(scale.scaleFactor),
+      save(view: baseImage(for: AppIcon.defaultIcon.view, scale: scale), size: scale.size * CGFloat(scale.scaleFactor),
            to: mainIconExportPath.appendingPathComponent(AppiconsetContentsGenerator.fileName(appIconName: AppIcon.defaultIcon.imageName, scale: scale)))
     }
     try? AppiconsetContentsGenerator.contentsFile(for: AppIcon.defaultIcon.imageName, with: IconScale.macOSMainIconScales)
@@ -93,7 +86,8 @@ public struct AppIconExporter {
     for icon in AppIcon.allCases {
       try? FileManager.default.createDirectory(at: exportPath, withIntermediateDirectories: true, attributes: [:])
       
-      save(view: baseImage(for: icon.view), size: CGSize(width: 256, height: 256),
+      save(view: baseImage(for: icon.view, scale: .init(size: CGSize(width: 256, height: 256), scaleFactor: 1, purpose: .mac)),
+           size: CGSize(width: 256, height: 256),
            to: exportPath.appendingPathComponent("\(icon.imageName).png"))
     }
   }
