@@ -1,4 +1,4 @@
-// swift-tools-version:5.6
+// swift-tools-version:5.7
 import PackageDescription
 import Foundation
 
@@ -9,10 +9,10 @@ if helloPackagesPath.hasPrefix("file://") {
 }
 
 let helloColorPackage: Package.Dependency
-if !helloPackagesPath.contains("/DerivedData/") && FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-color") {
-  helloColorPackage = .package(name: "hello-color", path: "\(helloPackagesPath)hello-color")
+if !helloPackagesPath.contains("/DerivedData/") && FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-app") {
+  helloColorPackage = .package(name: "hello-app", path: "\(helloPackagesPath)hello-app")
 } else {
-  helloColorPackage = .package(url: "https://github.com/hello-apps/hello-color",
+  helloColorPackage = .package(url: "https://github.com/hello-apps/hello-app",
                                branch: "main")
 }
 
@@ -22,7 +22,7 @@ let dependencies: [Package.Dependency] = [
 
 let package = Package(
   name: "AppIconGenerator",
-  platforms: [.macOS(.v12)],
+  platforms: [.macOS(.v13)],
   products: [
     .library(
       name: "AppIconGenerator",
@@ -33,7 +33,7 @@ let package = Package(
     .target(
       name: "AppIconGenerator",
       dependencies: [
-        .product(name: "HelloColor", package: "hello-color")
+        .product(name: "HelloApp", package: "hello-app")
       ]),
     .testTarget(
       name: "AppIconGeneratorTests",
