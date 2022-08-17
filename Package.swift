@@ -12,8 +12,7 @@ let helloColorPackage: Package.Dependency
 if !helloPackagesPath.contains("/DerivedData/") && FileManager.default.fileExists(atPath: "\(helloPackagesPath)hello-app") {
   helloColorPackage = .package(name: "hello-app", path: "\(helloPackagesPath)hello-app")
 } else {
-  helloColorPackage = .package(url: "https://github.com/hello-apps/hello-app",
-                               branch: "main")
+  helloColorPackage = .package(url: "https://github.com/adrianensan/hello-app", branch: "main")
 }
 
 let dependencies: [Package.Dependency] = [

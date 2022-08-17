@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "hello-core",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/adrianensan/hello-core",
+      "state" : {
+        "branch" : "main",
+        "revision" : "91d449e607408360a42ebc1a5e67062dfaac3918"
+      }
+    }
+  ],
+  "version" : 2
+}
